@@ -1,4 +1,8 @@
 import { Client } from "pg";
+import express from "express";
+
+const app = express();
+app.use(express.json());
 
 // const pgClient = new Client(
 //   "postgresql://neondb_owner:npg_Ht1P9UDMzdrb@ep-empty-flower-a1ovgnw2-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
@@ -13,14 +17,22 @@ const pgClient2 = new Client({
   ssl: true,
 });
 
-async function main() {
+app.post("/signup", async (req, res) => {
+  const { email, username, password } = req.body;
   await pgClient2.connect();
 
-  const insertQuery = `INSERT INTO users ()`;
+  const insertQuery = `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`;
 
-  const response = await pgClient2.query();
+  const response = await pgClient2.query(insertQuery, [
+    username,
+    email,
+    password,
+  ]);
+  console.log(response);
 
-  console.log(response.rows);
-}
+  res.json({
+    message: "USer signup successfull",
+  });
+});
 
-main();
+app.listen(3000);
